@@ -93,3 +93,36 @@ All of the examples produce this output (note the multi-byte character `PLUS-MIN
     which was good enough for them!
      
     $ python3 parse-unicode.py /tmp/example.txt 
+
+# Solve wordscapes puzzles
+This is based on an app available on phones.
+
+    $ python3 solve-wordscapes.py -h
+    usage: solve-wordscapes.py [-h] [--dictionary-file /path/to/dictionary] LETTERS PATTERN
+    
+    Solve wordscapes problems.
+    
+    positional arguments:
+      LETTERS               Letters which could be used in the solution, up to six, case-insensitive.
+      PATTERN               Enter constraints here. Use up to six characters. Use underscores or question marks for the letters to be filled in/guessed.
+    
+    options:
+      -h, --help            show this help message and exit
+      --dictionary-file /path/to/dictionary
+                            Depends on operating system, default is /usr/share/dict/american-english.
+    
+    Example patterns: "b?ll" "____" "ca_" "mo?se"
+
+For example:
+
+    $ python3 solve-wordscapes.py AGLmor _____
+    largo
+    margo
+    molar
+    moral
+
+And:
+
+    $ python3 solve-wordscapes.py aGlMoR _a_g_
+    largo
+    margo
