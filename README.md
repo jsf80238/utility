@@ -97,14 +97,13 @@ All of the examples produce this output (note the multi-byte character `PLUS-MIN
 # Solve wordscapes puzzles
 This is based on an app available on phones.
 
-    $ python3 solve-wordscapes.py -h
     usage: solve-wordscapes.py [-h] [--dictionary-file /path/to/dictionary] LETTERS PATTERN
     
     Solve wordscapes problems.
     
     positional arguments:
-      LETTERS               Letters which could be used in the solution, up to six, case-insensitive.
-      PATTERN               Enter constraints here. Use up to six characters. Use underscores or question marks for the letters to be filled in/guessed.
+      LETTERS               Letters which could be used in the solution, case-insensitive.
+      PATTERN               Enter constraints here. Use underscores or question marks for the letters to be filled in/guessed.
     
     options:
       -h, --help            show this help message and exit
@@ -115,7 +114,7 @@ This is based on an app available on phones.
 
 For example:
 
-    $ python3 solve-wordscapes.py AGLmor _____
+    $ python3 solve-wordscapes.py AGLmor ?????
     largo
     margo
     molar
@@ -123,6 +122,6 @@ For example:
 
 And:
 
-    $ python3 solve-wordscapes.py aGlMoR _a_g_
+    $ python3 solve-wordscapes.py aGlMoR _a?g_
     largo
     margo
