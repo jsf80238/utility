@@ -25,6 +25,7 @@ if not match:
 # Get valid words
 valid_word_set = set([line.strip().lower() for line in open(dictionary_file).readlines()])
 
+match_set = set()
 for permutation in itertools.permutations(letters, len(pattern)):
     potential_match = "".join(list(permutation))
     # Check whether this permutation is a valid word
@@ -35,4 +36,6 @@ for permutation in itertools.permutations(letters, len(pattern)):
     regex = re.compile(search_pattern_text, re.IGNORECASE)
     match = regex.match(potential_match)
     if match:
-        print(match.group(1).lower())
+        match_set.add(match.group(1).lower())
+
+print("\n".join(sorted(match_set)))
