@@ -96,6 +96,7 @@ All of the examples produce this output (note the multi-byte character `PLUS-MIN
 
 # Solve wordscapes puzzles
 This is based on an app available on phones.
+It uses the American English dictionary available by default on my Kubuntu system, and you can specify whatever dictionary you like.
 
     usage: solve-wordscapes.py [-h] [--dictionary-file /path/to/dictionary] LETTERS PATTERN
     
