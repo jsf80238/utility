@@ -125,3 +125,32 @@ And:
     $ python3 solve-wordscapes.py aGlMoR _a?g_
     largo
     margo
+
+# Help with Wordle puzzles
+Knowing a lot of words helps with this game, but making the initial guesses with words having the most likely vowels and consonants also helps.
+
+    $ python wordle-helper.py -h
+    usage: wordle-helper.py [-h] [--dictionary-file /path/to/dictionary] LENGTH VOWELS
+    
+    Generate lists of words with vowels.
+    
+    positional arguments:
+      LENGTH                Length of the words to generate.
+      VOWELS                How many vowels the words should have.
+    
+    options:
+      -h, --help            show this help message and exit
+      --dictionary-file /path/to/dictionary
+                            Depends on operating system, default is /usr/share/dict/american-english.
+
+Example:
+
+    $ python wordle-helper.py 7 3 | head -3
+    abelson
+    acheson
+    aelfric
+
+    $ python wordle-helper.py 7 3 | tail -3
+    zodiacs
+    zombies
+    zygotes
