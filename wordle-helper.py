@@ -26,6 +26,4 @@ for word in allowed_word_set:
         if sum([1 for x in word if x in VOWELS]) == vowel_count:
             candidate_dict[vowel_count].append(word)
 for key, value in sorted(candidate_dict.items()):
-    print(key)
     print(linesep.join(value))
-    print()
