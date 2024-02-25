@@ -22,35 +22,41 @@ length = 5
 
 class ColorCode(enum.StrEnum):
     not_guessed: str = f'{Fore.black}{Back.white}'
-    guessed_exactly_correctly: str = f'{Fore.blue}{Back.green}'
-    guessed_correctly: str = f'{Fore.black}{Back.green}'
-    guessed_incorrectly: str = f'{Fore.black}{Back.red}'
+    guessed_exactly_correctly: str = f'{Fore.black}{Back.green}'
+    guessed_correctly: str = f'{Fore.blue}{Back.rgb(211, 211, 211)}'
+    guessed_incorrectly: str = f'{Fore.black}{Back.yellow}'
+    matched: str = f'{Fore.green}{Back.blue}'
+    not_matched: str = f'{Fore.yellow}{Back.blue}'
 
 
 letter_dict = dict()
 for char in string.ascii_uppercase:
     letter_dict[char] = ColorCode.not_guessed
 
-candidate_list = [x.strip().lower() for x in open(dictionary_file).readlines() if "'" not in x and len(x.strip()) == length]
+candidate_list = [x.strip().upper() for x in open(dictionary_file).readlines() if "'" not in x and len(x.strip()) == length]
 answer = random.choice(candidate_list)
-answer = "AFTER"
+# answer = "AFTER"
 guess_list = list()
 
 while True:
     print()
     for letters, styles in guess_list:
         for letter, style in zip(letters, styles):
-            print(" " + stylize(letter, style), end="")
-    print(f"{Style.reset}")
+            print(f"{Style.reset} " + stylize(letter, style), end="")
+        print(f"{Style.reset}")
+        print()
     for key, value in letter_dict.items():
         style = letter_dict[key]
-        print(" " + stylize(key, style), end="")
+        print(f"{Style.reset} " + stylize(key, style), end="")
     print(f"{Style.reset}")
     print()
-    # guess = input("->").upper()
-    guess = ''.join(random.choices(string.ascii_uppercase, k=length))
+    guess = input("->").upper()
+    # guess = ''.join(random.choices(string.ascii_uppercase, k=length))
     if len(guess) != length:
         print("Incorrect length!")
+        continue
+    if guess not in candidate_list:
+        print("Not a valid word!")
         continue
 
     exactly_correct_letter_count = 0
