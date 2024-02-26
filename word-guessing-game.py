@@ -23,10 +23,6 @@ guess_list.append("YOUNG")
 guess_list.append("FASTS")
 guess_list.append("ENTER")
 
-'''
-
-<div class="div-3"></div>
-'''
 while True:
     html = """<!DOCTYPE html>
         <html>
