@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Word guessing game</title>
+
+    <style>
+        html {
+            font-family: sans-serif;
+        }
+
+        body {
+            width: 50%;
+            max-width: 800px;
+            min-width: 480px;
+            margin: 0 auto;
+        }
+
+        .form input[type="number"] {
+            width: 200px;
+        }
+
+        .lastResult {
+            color: white;
+            padding: 3px;
+        }
+
+        input:invalid {
+            border: red solid 3px;
+        }
+
+        .not_guessed_gallery {
+            color: black;
+            background-color: #D7DBDD;
+        }
+
+        .guessed_exactly_correctly_guessgrid {
+            color: black;
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+
+        .guessed_correctly_gallery {
+            color: blue;
+            background-color: #D7DBDD;
+        }
+
+        .guessed_correctly_guessgrid {
+            color: black;
+            background-color: blue;
+        }
+
+        .guessed_incorrectly_gallery {
+            color: red;
+            background-color: #D7DBDD;
+        }
+
+        .guessed_incorrectly_guessgrid {
+            color: black;
+            background-color: red;
+        }
+
+        .empty_guess_square {
+            color: white;
+            background-color: #D7DBDD;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Word guessing game</h1>
+
+    <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
+        what letters were correct.</p>
+
+    <div class="form">
+        <label for="guessField">Enter a guess: </label>
+        <!-- <input type="number" min="1" max="100" required id="guessField" class="guessField"> -->
+        <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
+        <input type="submit" value="Submit guess" class="guessSubmit">
+    </div>
+
+    <div class="resultParas">
+        <p class="guesses"></p>
+        <p class="lastResult"></p>
+    </div>
+
+    <script>
+
+        let arr = ["abide", "abode", "about", "above", "abuse", "acted", "actor"];
+
+        let answer = arr[(Math.floor(Math.random() * arr.length))];
+        let previousGuesses = new Array();
+
+        class GuessResult {
+            constructor(gallery, guessgrid) {
+                this.gallery_style = gallery;
+                this.guessgrid_style = guessgrid;
+            }
+        }
+
+        const NOT_GUESSED = new GuessResult("not_guessed_gallery", null);
+        const GUESSED_EXACTLY_CORRECTLY = new GuessResult(null, "guessed_exactly_correctly_guessgrid");
+        const GUESSED_CORRECTLY = new GuessResult("guessed_correctly_gallery", "guessed_correctly_guessgrid");
+        const GUESSED_INCORRECTLY = new GuessResult("guessed_incorrectly_gallery", "guessed_incorrectly_guessgrid");
+
+        const gallery_dict = {};
+        for (let char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+            gallery_dict[char] = NOT_GUESSED;
+        }
+
+        const guesses = document.querySelector(".guesses");
+        const lastResult = document.querySelector(".lastResult");
+
+        const guessSubmit = document.querySelector(".guessSubmit");
+        const guessField = document.querySelector(".guessField");
+
+        function checkGuess() {
+            const userGuess = guessField.value;
+            previousGuesses.push(userGuess)
+
+            if (userGuess === answer) {
+                lastResult.textContent = "Congratulations! You got it right!";
+                lastResult.style.backgroundColor = "green";
+                // setGameOver();
+            } else {
+                lastResult.textContent = "Wrong!";
+                lastResult.style.backgroundColor = "red";
+            }
+
+            guessField.value = "";
+            guessField.focus();
+        }
+
+        guessSubmit.addEventListener("click", checkGuess);
+
+    </script>
+</body>
+
+</html>
