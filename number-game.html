@@ -110,13 +110,13 @@
             <tbody class="guesses"></tbody>
         </table>
     </div> -->
-    <hr>
+    <p></p>
     <div>
         <table class="guesses" id="guesses">
             <tbody></tbody>
         </table>
     </div>
-    <hr>
+    <p></p>
     <div class="form">
         <label for="guessField">Enter a guess: </label>
         <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
@@ -125,9 +125,28 @@
     </div>
 
     <script>
+        function getText() {
+            // read text from URL location
+            var request = new XMLHttpRequest();
+            request.open('GET', 'http://www.puzzlers.org/pub/wordlists/pocket.txt', true);
+            request.send(null);
+            request.onreadystatechange = function () {
+                if (request.readyState === 4 && request.status === 200) {
+                    var type = request.getResponseHeader('Content-Type');
+                    if (type.indexOf("text") !== 1) {
+                        return request.responseText;
+                    }
+                }
+            }
+        }
+        const thisDir = window.location.origin + window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'));
+        const wordUrl = thisDir + "/word-guessing-game-words.txt"
+        const wordData = getText(wordUrl)
+        alert(wordData)
+
         const answerLength = 5;
         // const arr = ["abide", "abode", "about", "above", "abuse", "acted", "actor"];
-        const arr = ["abide"];
+        const possible_words = ["abide"];
 
         const galleryNotGuessed = { backgroundColor: "lightgrey", foregroundColor: "black", style: "galleryNotGuessed" }
         const galleryGuessedCorrectly = { backgroundColor: "lightgreen", foregroundColor: "black", style: "galleryGuessedCorrectly" }
@@ -183,7 +202,6 @@
             if (tableRows.length > 0) {
                 galleryData.removeChild(tableRows[0]);
             }
-
             row = document.createElement('tr');
             for (const letter in galleryDict) {
                 const td = document.createElement('td');
@@ -209,7 +227,7 @@
 
             lastResult.style.backgroundColor = "white";
 
-            correct_answer = arr[(Math.floor(Math.random() * arr.length))].toUpperCase();
+            correct_answer = possible_words[(Math.floor(Math.random() * possible_words.length))].toUpperCase();
 
             for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
                 galleryDict[char] = galleryNotGuessed;
