@@ -37,6 +37,11 @@
             padding: 5px;
         }
 
+        .galleryData {
+            display: flex;
+            justify-content: center;
+        }
+
         .guesses {
             display: flex;
             justify-content: center;
@@ -90,14 +95,13 @@
 
 <body>
     <h1>Word Guessing Game</h1>
-
     <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
         what letters were correct.</p>
-    <hr>
-    <div class=""">
+    <p></p>
+    <div class="">
         <table class="">
-            <tbody class=" galleryData">
-        </tbody>
+            <tbody class="galleryData">
+            </tbody>
         </table>
     </div>
     <!-- <hr>
@@ -107,15 +111,14 @@
         </table>
     </div> -->
     <hr>
-    <div class="resultParas">
-        <table class="guesses">
-            <tbody class="guesses"></tbody>
+    <div>
+        <table class="guesses" id="guesses">
+            <tbody></tbody>
         </table>
     </div>
     <hr>
     <div class="form">
         <label for="guessField">Enter a guess: </label>
-        <!-- <input type="number" min="1" max="100" required id="guessField" class="guessField"> -->
         <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
         <input type="submit" value="Submit guess" class="guessSubmit">
         <p class="lastResult"></p>
@@ -123,9 +126,8 @@
 
     <script>
         const answerLength = 5;
-        const arr = ["abide", "abode", "about", "above", "abuse", "acted", "actor"];
-        let correct_answer = "";
-        let galleryDict = {};
+        // const arr = ["abide", "abode", "about", "above", "abuse", "acted", "actor"];
+        const arr = ["abide"];
 
         const galleryNotGuessed = { backgroundColor: "lightgrey", foregroundColor: "black", style: "galleryNotGuessed" }
         const galleryGuessedCorrectly = { backgroundColor: "lightgreen", foregroundColor: "black", style: "galleryGuessedCorrectly" }
@@ -135,10 +137,46 @@
         const guessTableExactlyCorrect = { backgroundColor: "lightgreen", foregroundColor: "darkgreen", style: "guessTableExactlyCorrect" }
 
         const guesses = document.querySelector(".guesses");
+        const guessesTable = guesses.getElementsByTagName("tbody")[0];
         const lastResult = document.querySelector(".lastResult");
         const galleryData = document.querySelector(".galleryData");
         const guessSubmit = document.querySelector(".guessSubmit");
         const guessField = document.querySelector(".guessField");
+
+        let correct_answer = "";
+        let galleryDict = {};
+
+        function analyzeGuess(guess) {
+            let returnArray = [];
+            for (let i = 0; i < guess.length; i++) {
+                let guessedLetter = [...guess][i];
+                let answerLetter = [...correct_answer][i];
+                if (correct_answer.includes(guessedLetter)) {
+                    galleryDict[guessedLetter] = galleryGuessedCorrectly;
+                    if (guessedLetter === answerLetter) {
+                        returnArray.push(guessTableExactlyCorrect);
+                    } else {
+                        returnArray.push(guessTableCorrect);
+                    }
+                } else {
+                    galleryDict[guessedLetter] = galleryGuessedIncorrectly;
+                    returnArray.push(guessTableIncorrect);
+                }
+            }
+            return returnArray;
+        }
+
+        function displayGuesses(userGuess) {
+            const guessAnalysisArray = analyzeGuess(userGuess);
+            let row = guessesTable.insertRow()
+            for (i = 0; i < answerLength; i++) {
+                const letter = [...userGuess][i]
+                const td = document.createElement('td')
+                td.appendChild(document.createTextNode(letter));
+                td.className = guessAnalysisArray[i].style
+                row.appendChild(td);
+            }
+        }
 
         function displayGallery() {
             var tableRows = galleryData.getElementsByTagName('tr');
@@ -157,11 +195,9 @@
         }
 
         function resetGame() {
-            const resetParas = document.querySelectorAll(".form p");
-            for (const resetPara of resetParas) {
-                resetPara.textContent = "";
+            for (i = 0; i < guessesTable.rows.length; i++) {
+                guessesTable.deleteRow(0)
             }
-
             if (typeof resetButton !== 'undefined') {
                 resetButton.parentNode.removeChild(resetButton);
             }
@@ -191,40 +227,10 @@
             resetButton.addEventListener("click", resetGame);
         }
 
-        function analyzeGuess(guess) {
-            let returnArray = [];
-            for (let i = 0; i < guess.length; i++) {
-                let guessedLetter = [...guess][i];
-                let answerLetter = [...correct_answer][i];
-                if (correct_answer.includes(guessedLetter)) {
-                    galleryDict[guessedLetter] = galleryGuessedCorrectly;
-                    if (guessedLetter === answerLetter) {
-                        returnArray.push(guessTableExactlyCorrect);
-                    } else {
-                        returnArray.push(guessTableCorrect);
-                    }
-                } else {
-                    galleryDict[guessedLetter] = galleryGuessedIncorrectly;
-                    returnArray.push(guessTableIncorrect);
-                }
-            }
-            return returnArray;
-        }
-
         function checkGuess() {
             const userGuess = guessField.value.toUpperCase();
-            guessAnalysisArray = analyzeGuess(userGuess);
 
-            let row = document.createElement('tr');
-            for (i = 0; i < answerLength; i++) {
-                const letter = [...userGuess][i]
-                const td = document.createElement('td')
-                td.appendChild(document.createTextNode(letter));
-                td.className = guessAnalysisArray[i].style
-                row.appendChild(td);
-            }
-            guesses.appendChild(row)
-
+            displayGuesses(userGuess);
             displayGallery();
 
             if (userGuess === correct_answer) {
