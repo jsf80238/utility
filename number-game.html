@@ -18,6 +18,25 @@
             margin: 0 auto;
         }
 
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            height: 100%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        table tr td {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+
+        table tr:nth-child(odd) {
+            background: #7d5454;
+        }
+
         .form input[type="number"] {
             width: 200px;
         }
@@ -75,6 +94,18 @@
     <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
         what letters were correct.</p>
 
+    <div class="">
+        <table class="">
+            <tbody class="guesses"></tbody>
+        </table>
+    </div>
+
+    <div class=""">
+        <table class="">
+            <tbody class="galleryData"></tbody>
+        </table>
+    </div>
+
     <div class="form">
         <label for="guessField">Enter a guess: </label>
         <!-- <input type="number" min="1" max="100" required id="guessField" class="guessField"> -->
@@ -96,8 +127,8 @@
 
         class GuessResult {
             constructor(gallery, guessgrid) {
-                this.gallery_style = gallery;
-                this.guessgrid_style = guessgrid;
+                this.galleryStyle = gallery;
+                this.guessgridStyle = guessgrid;
             }
         }
 
@@ -106,20 +137,37 @@
         const GUESSED_CORRECTLY = new GuessResult("guessed_correctly_gallery", "guessed_correctly_guessgrid");
         const GUESSED_INCORRECTLY = new GuessResult("guessed_incorrectly_gallery", "guessed_incorrectly_guessgrid");
 
-        const gallery_dict = {};
+        const galleryDict = {};
         for (let char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-            gallery_dict[char] = NOT_GUESSED;
+            galleryDict[char] = NOT_GUESSED;
         }
 
         const guesses = document.querySelector(".guesses");
         const lastResult = document.querySelector(".lastResult");
-
+        const galleryData = document.querySelector(".galleryData");
         const guessSubmit = document.querySelector(".guessSubmit");
         const guessField = document.querySelector(".guessField");
 
         function checkGuess() {
             const userGuess = guessField.value;
             previousGuesses.push(userGuess)
+
+            var tableRows = galleryData.getElementsByTagName('tr');
+            if (tableRows.length > 0) {
+                galleryData.removeChild(tableRows[0]);
+            }
+            // var rowCount = tableRows.length;
+            // for (var x = rowCount - 1; x > 0; x--) {
+            //     galleryData.removeChild(tableRows[x]);
+            // }
+            const row = document.createElement('tr');
+            for (const letter in galleryDict) {
+                // alert(`key: ${letter}, value: ${galleryDict[letter].galleryStyle},  ${galleryDict[letter].guessgridStyle}`);
+                const td = document.createElement('td');
+                td.appendChild(document.createTextNode(letter));
+                row.appendChild(td);
+            }
+            galleryData.appendChild(row)
 
             if (userGuess === answer) {
                 lastResult.textContent = "Congratulations! You got it right!";
@@ -132,6 +180,42 @@
 
             guessField.value = "";
             guessField.focus();
+        }
+
+        function analyzeGuesses() {
+            let exactly_correct_letter_count = 0;
+            let guesses_table_html = "<table>\n";
+            for (let guess of guess_list) {
+                guesses_table_html += "<tr>\n";
+                for (let i = 0; i < guess.length; i++) {
+                    let guessed_letter = guess[i];
+                    let answer_letter = correct_answer[i];
+                    if (guessed_letter in correct_answer) {
+                        galleryDict[guessed_letter] = GuessResult.GUESSED_CORRECTLY;
+                        if (guessed_letter === answer_letter) {
+                            guesses_table_html += `<td class="${GuessResult.GUESSED_EXACTLY_CORRECTLY.value[1]}">${guessed_letter}</td>\n`;
+                            exactly_correct_letter_count += 1;
+                        } else {
+                            guesses_table_html += `<td class="${GuessResult.GUESSED_CORRECTLY.value[1]}">${guessed_letter}</td>\n`;
+                        }
+                    } else {
+                        galleryDict[guessed_letter] = GuessResult.GUESSED_INCORRECTLY;
+                        guesses_table_html += `<td class="${GuessResult.GUESSED_INCORRECTLY.value[1]}">${guessed_letter}</td>\n`;
+                    }
+                }
+                guesses_table_html += "</tr>\n";
+            }
+            if (exactly_correct_letter_count !== LENGTH) {
+                guesses_table_html += "<tr>";
+                for (let i = 0; i < LENGTH; i++) {
+                    guesses_table_html += `<td class="empty_guess_square">&nbsp;</td>`;
+                }
+                guesses_table_html += "</tr>";
+            } else {
+                guesses_table_html += "</table>\n";
+            }
+            html += guesses_table_html;
+            html += "<hr>\n";
         }
 
         guessSubmit.addEventListener("click", checkGuess);
