@@ -37,6 +37,11 @@
             padding: 5px;
         }
 
+        .guesses {
+            display: flex;
+            justify-content: center;
+        }
+
         .form input {
             width: 150px;
         }
@@ -84,7 +89,7 @@
 </head>
 
 <body>
-    <h1>Word guessing game</h1>
+    <h1>Word Guessing Game</h1>
 
     <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
         what letters were correct.</p>
@@ -95,9 +100,15 @@
         </tbody>
         </table>
     </div>
+    <!-- <hr>
+    <div class="guesses">
+        <table class="guesses">
+            <tbody class="guesses"></tbody>
+        </table>
+    </div> -->
     <hr>
-    <div class="">
-        <table class="">
+    <div class="resultParas">
+        <table class="guesses">
             <tbody class="guesses"></tbody>
         </table>
     </div>
@@ -107,35 +118,78 @@
         <!-- <input type="number" min="1" max="100" required id="guessField" class="guessField"> -->
         <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
         <input type="submit" value="Submit guess" class="guessSubmit">
-    </div>
-    <hr>
-    <div class="resultParas">
-        <p class="guesses"></p>
         <p class="lastResult"></p>
     </div>
 
     <script>
         const answerLength = 5;
         const arr = ["abide", "abode", "about", "above", "abuse", "acted", "actor"];
-        const correct_answer = arr[(Math.floor(Math.random() * arr.length))].toUpperCase();
+        let correct_answer = "";
+        let galleryDict = {};
 
-        const galleryNotGuessed = {backgroundColor: "lightgrey", foregroundColor: "black", style: "galleryNotGuessed"}
-        const galleryGuessedCorrectly = {backgroundColor: "lightgreen", foregroundColor: "black", style: "galleryGuessedCorrectly"}
-        const galleryGuessedIncorrectly = {backgroundColor: "lightgrey", foregroundColor: "red", style: "galleryGuessedIncorrectly"}
-        const guessTableIncorrect = {backgroundColor: "black", foregroundColor: "white", style: "guessTableIncorrect"}
-        const guessTableCorrect = {backgroundColor: "lightgreen", foregroundColor: "black", style: "guessTableCorrect"}
-        const guessTableExactlyCorrect = {backgroundColor: "lightgreen", foregroundColor: "darkgreen", style: "guessTableExactlyCorrect"}
-
-        const galleryDict = {};
-        for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-            galleryDict[char] = galleryNotGuessed;
-        }
+        const galleryNotGuessed = { backgroundColor: "lightgrey", foregroundColor: "black", style: "galleryNotGuessed" }
+        const galleryGuessedCorrectly = { backgroundColor: "lightgreen", foregroundColor: "black", style: "galleryGuessedCorrectly" }
+        const galleryGuessedIncorrectly = { backgroundColor: "lightgrey", foregroundColor: "red", style: "galleryGuessedIncorrectly" }
+        const guessTableIncorrect = { backgroundColor: "black", foregroundColor: "white", style: "guessTableIncorrect" }
+        const guessTableCorrect = { backgroundColor: "lightgreen", foregroundColor: "black", style: "guessTableCorrect" }
+        const guessTableExactlyCorrect = { backgroundColor: "lightgreen", foregroundColor: "darkgreen", style: "guessTableExactlyCorrect" }
 
         const guesses = document.querySelector(".guesses");
         const lastResult = document.querySelector(".lastResult");
         const galleryData = document.querySelector(".galleryData");
         const guessSubmit = document.querySelector(".guessSubmit");
         const guessField = document.querySelector(".guessField");
+
+        function displayGallery() {
+            var tableRows = galleryData.getElementsByTagName('tr');
+            if (tableRows.length > 0) {
+                galleryData.removeChild(tableRows[0]);
+            }
+
+            row = document.createElement('tr');
+            for (const letter in galleryDict) {
+                const td = document.createElement('td');
+                td.appendChild(document.createTextNode(letter));
+                td.className = galleryDict[letter].style
+                row.appendChild(td);
+            }
+            galleryData.appendChild(row)
+        }
+
+        function resetGame() {
+            const resetParas = document.querySelectorAll(".form p");
+            for (const resetPara of resetParas) {
+                resetPara.textContent = "";
+            }
+
+            if (typeof resetButton !== 'undefined') {
+                resetButton.parentNode.removeChild(resetButton);
+            }
+
+            guessField.disabled = false;
+            guessSubmit.disabled = false;
+            guessField.value = "";
+            guessField.focus();
+
+            lastResult.style.backgroundColor = "white";
+
+            correct_answer = arr[(Math.floor(Math.random() * arr.length))].toUpperCase();
+
+            for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                galleryDict[char] = galleryNotGuessed;
+            }
+
+            displayGallery();
+        }
+
+        function setGameOver() {
+            guessField.disabled = true;
+            guessSubmit.disabled = true;
+            resetButton = document.createElement("button");
+            resetButton.textContent = "Start new game";
+            document.body.append(resetButton);
+            resetButton.addEventListener("click", resetGame);
+        }
 
         function analyzeGuess(guess) {
             let returnArray = [];
@@ -156,12 +210,13 @@
             }
             return returnArray;
         }
+
         function checkGuess() {
             const userGuess = guessField.value.toUpperCase();
             guessAnalysisArray = analyzeGuess(userGuess);
 
             let row = document.createElement('tr');
-            for (i=0; i<answerLength; i++) {
+            for (i = 0; i < answerLength; i++) {
                 const letter = [...userGuess][i]
                 const td = document.createElement('td')
                 td.appendChild(document.createTextNode(letter));
@@ -170,24 +225,12 @@
             }
             guesses.appendChild(row)
 
-            var tableRows = galleryData.getElementsByTagName('tr');
-            if (tableRows.length > 0) {
-                galleryData.removeChild(tableRows[0]);
-            }
-
-            row = document.createElement('tr');
-            for (const letter in galleryDict) {
-                const td = document.createElement('td');
-                td.appendChild(document.createTextNode(letter));
-                td.className = galleryDict[letter].style
-                row.appendChild(td);
-            }
-            galleryData.appendChild(row)
+            displayGallery();
 
             if (userGuess === correct_answer) {
                 lastResult.textContent = "Congratulations! You got it right!";
                 lastResult.style.backgroundColor = "green";
-                // setGameOver();
+                setGameOver();
             } else {
                 lastResult.textContent = "";
                 lastResult.style.backgroundColor = "white";
@@ -197,6 +240,7 @@
             guessField.focus();
         }
 
+        resetGame();
         guessSubmit.addEventListener("click", checkGuess);
 
     </script>
