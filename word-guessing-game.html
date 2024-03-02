@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Word guessing game</title>
+
+    <style>
+        html {
+            font-family: monospace;
+        }
+
+        body {
+            width: 50%;
+            max-width: 800px;
+            min-width: 480px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            height: 100%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        table tr td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+
+        .galleryData {
+            display: flex;
+            justify-content: center;
+        }
+
+        .guesses {
+            display: flex;
+            justify-content: center;
+        }
+
+        .form input {
+            width: 150px;
+        }
+
+        .lastResult {
+            padding: 3px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input:invalid {
+            border: red solid 3px;
+        }
+
+        .galleryNotGuessed {
+            color: white;
+            background-color: black;
+        }
+
+        .galleryGuessedCorrectly {
+            color: black;
+            background-color: lightgreen;
+        }
+
+        .galleryGuessedIncorrectly {
+            color: black;
+            background-color: tomato;
+        }
+
+        .guessTableIncorrect {
+            color: black;
+            background-color: tomato;
+        }
+
+        .guessTableCorrect {
+            color: black;
+            background-color: lightblue;
+        }
+
+        .guessTableExactlyCorrect {
+            color: black;
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+
+        .keyTable {
+            display: flex;
+            justify-content: center;
+        }
+
+        .keyIncorrect {
+            color: black;
+            background-color: tomato;
+            column-width: 125px;
+            border: 1px solid #000;
+        }
+
+        .keyCorrect {
+            color: black;
+            background-color: lightblue;
+            column-width: 125px;
+            border: 1px solid #000;
+        }
+
+        .keyExactlyCorrect {
+            color: black;
+            background-color: lightgreen;
+            column-width: 125px;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Word Guessing Game</h1>
+    <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
+        how your guess matches (or does not) the answer with these colors:</p>
+    <p></p>
+    <table class="keyTable">
+        <tbody>
+            <tr>
+                <th class="keyIncorrect">Incorrect</th>
+                <th class="keyCorrect">Correct</th>
+                <th class="keyExactlyCorrect">Exactly Correct</th>
+            </tr>
+        </tbody>
+    </table>
+    <p></p>
+    <div class="">
+        <table class="">
+            <tbody class="galleryData">
+            </tbody>
+        </table>
+    </div>
+    <p></p>
+    <div>
+        <table class="guesses" id="guesses">
+            <tbody></tbody>
+        </table>
+    </div>
+    <p></p>
+    <div class="form" align="center">
+        <!-- <label for="guessField">Enter a guess: </label> -->
+        <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
+        <br>
+        <input type="submit" value="Guess" class="guessSubmit">
+        <p class="lastResult"></p>
+    </div>
+
+    <script>
+        const answerLength = 5;
+        const possibleAnswers = ["ABACK", "ABBEY", "ABBOT", "ABIDE", "ABLER", "ABODE", "ABOUT", "ABOVE", "ABUSE", "ACHED", "ACTED", "ACTOR", "ADAGE", "ADAPT", "ADDED", "ADIEU", "ADMIT", "ADOBE", "ADOPT", "ADORE", "ADORN", "ADULT", "AFFIX", "AFOOT", "AFTER", "AFTUH", "AGAIN", "AGENT", "AGING", "AGONY", "AGREE", "AHEAD", "AIDED", "AIMED", "AIRED", "AISLE", "ALARM", "ALBUM", "ALECK", "ALERT", "ALGAE", "ALIBI", "ALIEN", "ALIGN", "ALIKE", "ALLAY", "ALLEY", "ALLOT", "ALLOW", "ALLOY", "ALOFT", "ALONE", "ALONG", "ALOOF", "ALOUD", "ALTAR", "ALTER", "ALTHO", "AMAZE", "AMEND", "AMICI", "AMIDE", "AMIGO", "AMINO", "AMITY", "AMONG", "AMPLY", "AMUSE", "ANGEL", "ANGER", "ANGLE", "ANION", "ANISE", "ANKLE", "ANNEE", "ANNEX", "ANNOY", "ANNUM", "ANODE", "ANSUH", "ANVIL", "AORTA", "APART", "APPLE", "APPLY", "APRIL", "APRON", "APTLY", "AQUAM", "ARDOR", "ARENA", "ARGON", "ARGOT", "ARGUE", "ARISE", "ARMED", "ARMOR", "AROMA", "AROSE", "ARRAY", "ARROW", "ARSON", "ASIDE", "ASKED", "ASKEW", "ASPEN", "ASSAI", "ASSAY", "ASSET", "ATONE", "ATTIC", "AUDIO", "AUDIT", "AUGEN", "AVAIL", "AVANT", "AVERT", "AVOID", "AWAIT", "AWAKE", "AWARD", "AWAYE", "AWFUL", "AWOKE", "AXIOM", "BABEL", "BACON", "BADGE", "BADLY", "BAKED", "BAKER", "BANJO", "BARGE", "BARON", "BASED", "BASER", "BASIC", "BASIN", "BASSO", "BATCH", "BATHE", "BATON", "BAYED", "BAYLY", "BEACH", "BEARD", "BEAST", "BEBOP", "BEECH", "BEFOH", "BEGAN", "BEGET", "BEGIN", "BEGUN", "BEING", "BELCH", "BELLY", "BELOW", "BENCH", "BERRY", "BERTH", "BESET", "BEVEL", "BEVOR", "BICEP", "BILGE", "BINGE", "BIRCH", "BIRTH", "BISON", "BITCH", "BITER", "BLACK", "BLADE", "BLAME", "BLANK", "BLAST", "BLAZE", "BLEAT", "BLEED", "BLEND", "BLEST", "BLIND", "BLINK", "BLITZ", "BLOAT", "BLOCK", "BLOKE", "BLOOD", "BLOOM", "BLOWN", "BLUFF", "BLUNT", "BLUSH", "BOARD", "BOAST", "BOBBY", "BOGEY", "BOITE", "BONGO", "BOOBY", "BOOST", "BOOTH", "BOOTY", "BOOZE", "BORAX", "BORED", "BORER", "BORNE", "BOSOM", "BOUGH", "BOUND", "BOWED", "BOWER", "BOXED", "BOXER", "BRACE", "BRAIN", "BRAKE", "BRAND", "BRAVE", "BRAWL", "BREAD", "BREAK", "BREED", "BRIBE", "BRICK", "BRIDE", "BRIEF", "BRING", "BRINK", "BROIL", "BROKE", "BRONC", "BROOD", "BROOK", "BROOM", "BROTH", "BROWN", "BRUNT", "BRUSH", "BRUTE", "BUDDY", "BUDGE", "BUGGY", "BUGLE", "BUILD", "BUILT", "BULGE", "BULLY", "BUNCH", "BURNE", "BURNT", "BURST", "BUYER", "CABIN", "CABLE", "CACAO", "CACHE", "CADET", "CADRE", "CAGED", "CAKED", "CAMEL", "CANDY", "CANOE", "CANON", "CANTO", "CAPER", "CARED", "CARGO", "CARNE", "CAROB", "CARRY", "CARTE", "CARVE", "CASED", "CASTE", "CATCH", "CATER", "CAUSE", "CAVED", "CAVIN", "CEASE", "CHAFE", "CHAIN", "CHAIR", "CHALK", "CHANT", "CHARM", "CHART", "CHASE", "CHASM", "CHEAP", "CHEAT", "CHECK", "CHEEK", "CHEER", "CHEST", "CHICK", "CHIDE", "CHIEF", "CHIEN", "CHILD", "CHILI", "CHILL", "CHINA", "CHIVE", "CHOIR", "CHOKE", "CHOLE", "CHOMP", "CHORD", "CHORE", "CHOSE", "CHUCK", "CHUMP", "CHUNK", "CHUTE", "CIDER", "CIGAR", "CILIA", "CINCH", "CIRCA", "CITED", "CIVIL", "CLAIM", "CLANG", "CLASH", "CLEAN", "CLEAR", "CLEAT", "CLEFT", "CLERK", "CLICK", "CLIFF", "CLIMB", "CLING", "CLOAK", "CLOCK", "CLOSE", "CLOTH", "CLOUD", "CLOUT", "CLOVE", "CLOWN", "CLUCK", "CLUMP", "CLUNG", "COACH", "COAST", "COBRA", "COCAO", "COCOA", "CODED", "COLDE", "COLON", "COLOR", "COMBO", "COMER", "COMET", "COMIC", "COMIN", "COMMA", "CONIC", "COPRA", "CORAL", "CORNE", "COSEC", "COSTE", "COUCH", "COUDN", "COUGH", "COULD", "COUNT", "COUPE", "COURT", "COVER", "COVET", "COYLY", "CRACK", "CRAFT", "CRAMP", "CRANE", "CRANK", "CRASH", "CRATE", "CRAVE", "CRAWL", "CRAZE", "CREAK", "CREAM", "CREDO", "CREED", "CREEK", "CREEP", "CREPE", "CREPT", "CREST", "CRIED", "CRIME", "CRISP", "CROAK", "CRONE", "CROOK", "CROWD", "CROWN", "CRUSH", "CRUST", "CRYPT", "CUBED", "CULTE", "CUMIN", "CURED", "CURIO", "CURRY", "CURSE", "CURVE", "CYCLE", "DADDY", "DAILY", "DAIRY", "DAMED", "DANCE", "DARED", "DATED", "DATUM", "DAUNT", "DAZED", "DEALT", "DEATH", "DEBUT", "DECAY", "DECOR", "DECRY", "DEFER", "DELAY", "DELLE", "DEMON", "DEPOT", "DEPTH", "DERBY", "DETER", "DEVIL", "DIARY", "DIETY", "DIGIT", "DIMLY", "DINED", "DINGO", "DIRGE", "DITCH", "DITTY", "DIVAN", "DIVED", "DIVER", "DOBLE", "DODGE", "DOGMA", "DOING", "DOLED", "DOMED", "DONOR", "DOPED", "DOSED", "DOUBT", "DOUGH", "DOWEL", "DOWER", "DOWRY", "DOZED", "DOZEN", "DRAFT", "DRAIN", "DRAMA", "DRANK", "DRAWL", "DRAWN", "DREAD", "DREAM", "DREWE", "DRIED", "DRIER", "DRIFT", "DRILL", "DRINK", "DRIVE", "DRONE", "DROOP", "DROVE", "DROWN", "DRUNK", "DRYER", "DRYLY", "DULLY", "DUPED", "DWARF", "DWELL", "DWELT", "DYING", "EAGLE", "EARLY", "EARTH", "EASED", "EASEL", "EATEN", "EBONY", "ECLAT", "EDEMA", "EDGED", "EGGED", "EIGHT", "EJECT", "ELBOW", "ELDER", "ELECT", "ELEGY", "ELITE", "ENACT", "ENDED", "ENDOW", "ENEMY", "ENJOY", "ENSUE", "ENTER", "ENTRY", "EPOCH", "EPOXY", "EPSOM", "EQUAL", "EQUIP", "ERASE", "ERECT", "ERRED", "ERROR", "ERUPT", "ESSAY", "ETHER", "ETHIC", "ETHYL", "EVADE", "EVENT", "EVERY", "EVOKE", "EXALT", "EXCEL", "EXERT", "EXILE", "EXIST", "EXPEL", "EXTRA", "EYING", "FABLE", "FACED", "FACET", "FACTO", "FADED", "FAERY", "FAIRY", "FAITH", "FAKED", "FAKER", "FALSE", "FANCY", "FARCE", "FAULT", "FAUNA", "FAVOR", "FEARE", "FEAST", "FEINT", "FELER", "FELLA", "FELON", "FEMME", "FENCE", "FERRY", "FETCH", "FETED", "FEVER", "FEWER", "FIBER", "FICHE", "FIELD", "FIEND", "FIFTH", "FIFTY", "FIGHT", "FILDE", "FILED", "FILLE", "FILLY", "FILTH", "FINAL", "FINED", "FINER", "FIRED", "FIRMA", "FIRST", "FIXED", "FLAIL", "FLAIR", "FLAME", "FLANK", "FLARE", "FLASH", "FLASK", "FLECK", "FLEET", "FLESH", "FLICK", "FLIER", "FLING", "FLINT", "FLIRT", "FLOAT", "FLOCK", "FLOOD", "FLOOR", "FLORA", "FLOUR", "FLOWN", "FLUFF", "FLUID", "FLUKE", "FLUNG", "FLUSH", "FLUTE", "FLYER", "FOLLY", "FORAY", "FORCE", "FORGE", "FORGO", "FORMA", "FORTE", "FORTH", "FORTY", "FORUM", "FOUND", "FOYER", "FRAME", "FRANC", "FRANK", "FRAUD", "FREAK", "FREED", "FREER", "FRIED", "FRISE", "FROCK", "FRONT", "FROST", "FROTH", "FROWN", "FROZE", "FRUIT", "FULLY", "FUMED", "FUNNY", "FUROR", "FUSED", "GABLE", "GAILY", "GAMMA", "GAMUT", "GAPED", "GARDE", "GAUGE", "GAUZE", "GAZED", "GAZER", "GEESE", "GENIE", "GENII", "GENRE", "GHOST", "GHOUL", "GIANT", "GIMME", "GIRTH", "GIVEN", "GIVER", "GLAND", "GLARE", "GLAZE", "GLEAM", "GLEAN", "GLIDE", "GLINT", "GLOBE", "GLOOM", "GLORY", "GLOVE", "GLUED", "GNOME", "GOING", "GOLLY", "GONNA", "GONNE", "GOODY", "GOOSE", "GORGE", "GOTTA", "GOURD", "GRACE", "GRADE", "GRAIN", "GRANT", "GRAPE", "GRAPH", "GRASP", "GRATA", "GRATE", "GRAVE", "GRAVY", "GRAZE", "GREAT", "GREED", "GREEN", "GREET", "GRIEF", "GRILL", "GRIND", "GRIST", "GROAN", "GROIN", "GROOM", "GROPE", "GROUP", "GROVE", "GROWL", "GROWN", "GRUNT", "GUARD", "GUEST", "GUIDE", "GUILD", "GUILE", "GUILT", "GUISE", "GULLY", "GUSTO", "GYPSY", "HABIT", "HAFTA", "HAINT", "HANDE", "HAREM", "HARRY", "HASTE", "HATCH", "HATED", "HAUNT", "HAUTE", "HAVEN", "HAVOC", "HAZEL", "HEADE", "HEARD", "HEARE", "HEART", "HEAVE", "HEDGE", "HELLO", "HENCE", "HEUTE", "HEVIN", "HEWED", "HIKED", "HILUM", "HINGE", "HIRED", "HITCH", "HOBBY", "HOIST", "HOLED", "HOMER", "HONEY", "HONOR", "HOOCH", "HOPED", "HORDE", "HORSE", "HOSTE", "HOTEL", "HOTLY", "HOUND", "HOUSE", "HOVEL", "HOVER", "HOWSE", "HUBBA", "HUBBY", "HUMAN", "HUMLY", "HUMOR", "HUNCH", "HURRY", "HYMEN", "ICING", "IDEAL", "IDIOM", "IDIOT", "IDLED", "IDLER", "IDYLL", "ILEUM", "IMAGE", "IMPLY", "INCUR", "INDEX", "INFER", "INFRA", "INLET", "INPUT", "INSET", "INTER", "INURE", "IRONY", "ISSUE", "IVORY", "JADED", "JELLY", "JEWEL", "JIFFY", "JOINT", "JOKED", "JOUST", "JUDGE", "JUICE", "JULEP", "JUNTA", "JUROR", "JUSTE", "KAZOO", "KEBOB", "KEINE", "KEYED", "KINDA", "KIOSK", "KNACK", "KNEEL", "KNELT", "KNIFE", "KNITE", "KNOCK", "KNOLL", "KNOTT", "KNOWN", "KONGA", "KRAFT", "KRAUT", "LABEL", "LABOR", "LACED", "LADLE", "LAITY", "LANCE", "LANGE", "LAPEL", "LAPSE", "LARGE", "LASSO", "LATCH", "LATER", "LATEX", "LATHE", "LAUGH", "LAYER", "LEAPT", "LEARN", "LEASE", "LEASH", "LEAST", "LEAVE", "LEDGE", "LEMON", "LEVEE", "LEVEL", "LEVER", "LIBEL", "LIFER", "LIGHT", "LIKED", "LIKEE", "LIMBO", "LIMIT", "LINED", "LINEN", "LINER", "LINGO", "LISTE", "LITER", "LITLE", "LIVED", "LIVER", "LOBBY", "LOCAL", "LODGE", "LOGIC", "LOOSE", "LOPED", "LOSER", "LOUSE", "LOUSY", "LOVED", "LOVER", "LOVIN", "LOWER", "LUBRA", "LUMEN", "LUNCH", "LUNGE", "LURCH", "LURED", "LYING", "LYMPH", "LYRIC", "M**YM", "MADAM", "MADLY", "MAGET", "MAGIC", "MAHUA", "MAJOR", "MAJUH", "MAKER", "MANIA", "MANOR", "MANSE", "MANYE", "MAPLE", "MARCH", "MARIA", "MARRY", "MATCH", "MATED", "MATER", "MAXIM", "MAYBE", "MAYOR", "MAYST", "MEANT", "MECUM", "MEDAL", "MEDIA", "MELEE", "MELON", "MERCY", "MERGE", "MERIT", "METAL", "METED", "METER", "METRE", "MEWED", "MEZZO", "MIDST", "MIGHT", "MINCE", "MINED", "MINER", "MINOR", "MIRTH", "MISSY", "MITER", "MITRE", "MIXED", "MIXER", "MODEL", "MOIRE", "MOLAR", "MONDE", "MONEI", "MONEY", "MONTH", "MOOED", "MORAL", "MOTEL", "MOTET", "MOTIF", "MOTOR", "MOTTO", "MOUGH", "MOULD", "MOUND", "MOUNT", "MOURN", "MOUSE", "MOUTH", "MOVED", "MOVIE", "MOWED", "MULCH", "MUNCH", "MURAL", "MUSED", "MUSIC", "MUSTA", "MUTED", "MYRRH", "NADIR", "NAMED", "NATCH", "NAVEL", "NAWTH", "NERVE", "NEVER", "NEWEL", "NEWER", "NEWLY", "NICER", "NICHE", "NIECE", "NIGER", "NIGHT", "NILLY", "NINTH", "NOIRE", "NOISE", "NOLLE", "NONCE", "NOOSE", "NORTH", "NOTCH", "NOTED", "NOVEL", "NUDGE", "NUPER", "NURSE", "NYLON", "NYMPH", "OATHE", "OCCUR", "OCEAN", "OCHER", "OCHRE", "ODDLY", "OFFAL", "OFFER", "OFTEN", "OGLED", "OILED", "OLDER", "OLIVE", "ONION", "ONLEH", "ONSET", "OOZED", "OPERA", "OPIUM", "OPTED", "ORATE", "ORBIT", "ORDER", "ORGAN", "ORZAE", "OTHER", "OTTER", "OUGHT", "OUNCE", "OUTDO", "OUTTA", "OWING", "OWNED", "OWNER", "OXIDE", "OZONE", "PACED", "PACEM", "PACER", "PAEAN", "PAGAN", "PAIDE", "PAINT", "PALED", "PALSY", "PANEL", "PANIC", "PANSY", "PAPER", "PARTY", "PASTE", "PATCH", "PATER", "PATIO", "PATSY", "PAUSE", "PAVED", "PAXAM", "PEACE", "PEACH", "PEARL", "PECAN", "PEDAL", "PENNY", "PERCH", "PERIL", "PETIT", "PHASE", "PHONE", "PHONY", "PHOTO", "PHYLA", "PIANO", "PIECE", "PIETY", "PIGEN", "PILED", "PILOT", "PINCH", "PINTO", "PIPED", "PIQUE", "PITCH", "PIVOT", "PIZZA", "PLACE", "PLAID", "PLAIN", "PLANE", "PLANK", "PLANT", "PLASM", "PLATE", "PLEAD", "PLIED", "PLUCK", "PLUMB", "PLUME", "PLUSH", "POARK", "POINT", "POISE", "POKED", "POKER", "POLIO", "POLKA", "POPPY", "PORCH", "PORED", "POSED", "POSSE", "POUCH", "POUND", "POWER", "PRANK", "PRICE", "PRICK", "PRIDE", "PRIME", "PRINT", "PRIOR", "PRIVY", "PRIZE", "PROBE", "PRONE", "PROOF", "PROSE", "PROVE", "PROWL", "PROXY", "PRUNE", "PRUTA", "PSALM", "PULSE", "PUNCH", "PUPIL", "PUPPY", "PURGE", "PURSE", "PUSSY", "PUTTY", "PYNTE", "QUACK", "QUAKE", "QUART", "QUEEN", "QUELL", "QUERY", "QUEST", "QUICK", "QUIET", "QUILL", "QUIRK", "QUIRT", "QUITE", "QUOTA", "QUOTE", "RABBI", "RACED", "RADAR", "RADII", "RADIO", "RAGED", "RAISE", "RAJAH", "RAKED", "RALLY", "RANCH", "RANGE", "RAPED", "RAPID", "RATED", "RATIO", "RATOR", "RAZOR", "REACH", "REACT", "READY", "REALM", "REBEL", "REBUT", "RECIT", "RECUR", "REFER", "REIGN", "RELAX", "RELAY", "RELIC", "RENEW", "REPAY", "REPEL", "REPLY", "RESIN", "RETCH", "REVEL", "RHEUM", "RHYME", "RIDER", "RIDGE", "RIFLE", "RIGHT", "RINSE", "RISEN", "RIVAL", "RIVEN", "RIVER", "ROACH", "ROAST", "ROBED", "ROBIN", "ROBOT", "RODEO", "ROGUE", "ROOST", "ROPED", "ROTOR", "ROUGE", "ROUGH", "ROUND", "ROUSE", "ROUTE", "ROVED", "ROWDY", "ROWED", "RUDDY", "RULED", "RULER", "RUMEN", "RUMMY", "RUMOR", "RUPEE", "RUSSE", "SABER", "SABLE", "SABRE", "SADLY", "SAFER", "SAINT", "SAITH", "SALAD", "SALON", "SALVE", "SALVO", "SANER", "SATIN", "SAUCE", "SAUTE", "SAVED", "SAVER", "SAVOR", "SAVVY", "SAYED", "SAYIN", "SCALD", "SCALE", "SCALP", "SCARE", "SCARF", "SCENE", "SCENT", "SCION", "SCOOP", "SCOPE", "SCORE", "SCORN", "SCOUR", "SCOUT", "SCRAP", "SCREW", "SCRIM", "SCRUB", "SCUFF", "SECCO", "SEDAN", "SEIZE", "SELLE", "SENSE", "SEPIA", "SEPTA", "SERGE", "SERUM", "SERVE", "SERVO", "SETUP", "SEVEN", "SEVER", "SEWED", "SEWER", "SHACK", "SHADE", "SHAFT", "SHAKE", "SHALL", "SHAME", "SHANK", "SHAPE", "SHARE", "SHAVE", "SHAWL", "SHEAF", "SHEAR", "SHEEN", "SHEEP", "SHEET", "SHEIK", "SHELF", "SHELL", "SHEWE", "SHIED", "SHIFT", "SHILL", "SHINE", "SHIRT", "SHISH", "SHOCK", "SHOJI", "SHONE", "SHOOK", "SHOOT", "SHORE", "SHORT", "SHOUT", "SHOVE", "SHOWN", "SHRED", "SHRUB", "SHRUG", "SHULD", "SHUNT", "SHUTE", "SHYLY", "SIDED", "SIDLE", "SIEGE", "SIEVE", "SIGHT", "SIGUE", "SILKE", "SINCE", "SINKT", "SIRED", "SIREN", "SIXTH", "SIXTY", "SIZED", "SKATE", "SKEET", "SKIFF", "SKILL", "SKIRT", "SKULK", "SKULL", "SLACK", "SLANG", "SLANT", "SLASH", "SLATE", "SLAVE", "SLEEP", "SLEET", "SLEPT", "SLICE", "SLICK", "SLIDE", "SLING", "SLOOP", "SLOPE", "SLUMP", "SLUNG", "SLYLY", "SMACK", "SMALL", "SMART", "SMASH", "SMEAR", "SMELL", "SMELT", "SMILE", "SMIRK", "SMOKE", "SNACK", "SNAIL", "SNAKE", "SNARE", "SNEAK", "SNEER", "SNICK", "SNIFF", "SNOOP", "SNORT", "SNOUT", "SNUCK", "SOFAR", "SOLID", "SOLVE", "SONAR", "SONNY", "SOUND", "SOUTH", "SPACE", "SPADE", "SPARE", "SPARK", "SPASM", "SPATE", "SPEAK", "SPEAR", "SPECK", "SPEED", "SPELL", "SPEND", "SPENT", "SPICE", "SPIKE", "SPILL", "SPINE", "SPIRE", "SPITE", "SPLIT", "SPOIL", "SPOKE", "SPOOF", "SPOON", "SPORT", "SPOUT", "SPRAY", "SPREE", "SPRIG", "SPRUE", "SPUME", "SPURT", "SQUAD", "SQUAT", "SQUAW", "STACK", "STAFF", "STAGE", "STAID", "STAIN", "STAIR", "STAKE", "STALL", "STAMP", "STAND", "STARE", "STARK", "START", "STATE", "STATU", "STAVE", "STEAD", "STEAK", "STEAL", "STEAM", "STEED", "STEEL", "STEEP", "STEER", "STEIN", "STERN", "STICK", "STIFF", "STILL", "STING", "STINK", "STINT", "STOCK", "STOLE", "STONE", "STOOD", "STOOL", "STOOP", "STORE", "STORM", "STORY", "STOVE", "STRAP", "STRAW", "STRAY", "STRIP", "STRUT", "STUCK", "STUDY", "STUFF", "STUMP", "STUNG", "STUNK", "STUNT", "STYLE", "SUGAR", "SUING", "SUITE", "SUMAC", "SUPER", "SUPRA", "SURGE", "SUSHI", "SWAMI", "SWAMP", "SWARM", "SWATH", "SWEAR", "SWEAT", "SWEEP", "SWEET", "SWELL", "SWEPT", "SWINE", "SWING", "SWIPE", "SWIRL", "SWOOP", "SWORD", "SWORE", "SWORN", "SWUNG", "SYNCE", "SYRUP", "TABAC", "TABLE", "TABOO", "TAFFY", "TAGUA", "TAINT", "TAKEN", "TAKIN", "TALLY", "TANGO", "TANSY", "TAPED", "TAPER", "TARRY", "TASTE", "TAUNT", "TAXED", "TEACH", "TEASE", "TECUM", "TEDDY", "TEETH", "TEMPO", "TEMPT", "TENOR", "TENSE", "TENTH", "TERRA", "TERRY", "THANK", "THATT", "THEAF", "THEFT", "THEIR", "THEME", "THERE", "THESE", "THICK", "THIEF", "THIGH", "THINE", "THING", "THINK", "THIRD", "THONG", "THORN", "THOSE", "THOUT", "THREE", "THREW", "THROW", "THUMB", "THUMP", "THUNK", "TIGER", "TIGHT", "TILED", "TILTH", "TIMED", "TIRED", "TITER", "TITLE", "TITRE", "TOAST", "TODAY", "TOKEN", "TONER", "TONIC", "TOOKE", "TOOTH", "TOPIC", "TORCH", "TORSO", "TOTAL", "TOUCH", "TOUGH", "TOWED", "TOWEL", "TOWER", "TOWNE", "TOXIN", "TRACE", "TRACK", "TRACT", "TRADE", "TRAIL", "TRAIN", "TRAIT", "TRAMP", "TRASH", "TREAD", "TREAT", "TREND", "TRIAD", "TRIAL", "TRIBE", "TRICK", "TRIED", "TRILL", "TRIOL", "TROOP", "TROUP", "TROUT", "TRUCE", "TRUCK", "TRUER", "TRULY", "TRUMP", "TRUNK", "TRUST", "TRUTH", "TRYIN", "TULIP", "TULLE", "TUMOR", "TUNED", "TUNIC", "TURNE", "TUTOR", "TWEED", "TWICE", "TWISE", "TWIST", "TYING", "TYPED", "ULCER", "UMBER", "UNAGI", "UNCAP", "UNCLE", "UNDER", "UNDID", "UNIFY", "UNION", "UNITE", "UNITY", "UNNNT", "UNSEE", "UNTIE", "UNTIL", "UPPED", "UPPER", "UPPON", "UPSET", "URGED", "URINE", "USAGE", "USHER", "USING", "USUAL", "USURP", "UTTER", "UTTUH", "VALET", "VALOR", "VALUE", "VALVE", "VAPOR", "VAULT", "VELDT", "VENOM", "VERGE", "VERIE", "VERSA", "VERSE", "VERVE", "VEXED", "VICAR", "VIDEO", "VIGIL", "VIGOR", "VILLA", "VINYL", "VISIT", "VISTA", "VITRO", "VOGUE", "VOICE", "VOTED", "VOTER", "VOUME", "VOWED", "VOWEL", "VYING", "WADED", "WAGED", "WAGER", "WAGON", "WAIST", "WAIVE", "WAKED", "WALTZ", "WANED", "WANNA", "WANTA", "WASTE", "WATCH", "WATER", "WAVED", "WAVER", "WAXED", "WEARY", "WEAVE", "WEDGE", "WEIGH", "WETLY", "WHACK", "WHARF", "WHEAT", "WHEEL", "WHERE", "WHICH", "WHIFF", "WHILE", "WHINE", "WHIRL", "WHITE", "WHOLE", "WHOOP", "WHORE", "WHOSE", "WIDEN", "WIDER", "WIDOW", "WIDTH", "WIELD", "WILLY", "WIPED", "WIRED", "WISER", "WITCH", "WOHAW", "WOLDE", "WOMAN", "WOMEN", "WOOED", "WORLD", "WORRY", "WORSE", "WORST", "WORTH", "WOULD", "WOUND", "WOVEN", "WRACK", "WRATH", "WREAK", "WRECK", "WREST", "WRING", "WRIST", "WRITE", "WRONG", "WROTE", "WRYLY", "WYNNE", "XENON", "XYLEM", "YACHT", "YEARD", "YEARN", "YEAST", "YIELD", "YODEL", "YOKEL", "YOUNG", "YOUTH", "YUCCA", "ZEBRA", "ZONED"];
+        const black = "black"
+        const white = "white"
+        const yellow = "yellow"
+        const green = "green"
+
+        const galleryNotGuessed = { backgroundColor: "lightgrey", foregroundColor: "black", style: "galleryNotGuessed" }
+        const galleryGuessedCorrectly = { backgroundColor: "lightgreen", foregroundColor: "black", style: "galleryGuessedCorrectly" }
+        const galleryGuessedIncorrectly = { backgroundColor: "lightgrey", foregroundColor: "red", style: "galleryGuessedIncorrectly" }
+        const guessTableIncorrect = { backgroundColor: "black", foregroundColor: "white", style: "guessTableIncorrect" }
+        const guessTableCorrect = { backgroundColor: "lightgreen", foregroundColor: "black", style: "guessTableCorrect" }
+        const guessTableExactlyCorrect = { backgroundColor: "lightgreen", foregroundColor: "darkgreen", style: "guessTableExactlyCorrect" }
+
+        const guesses = document.querySelector(".guesses");
+        const guessesTable = guesses.getElementsByTagName("tbody")[0];
+        const lastResult = document.querySelector(".lastResult");
+        const galleryData = document.querySelector(".galleryData");
+        const guessSubmit = document.querySelector(".guessSubmit");
+        const guessField = document.querySelector(".guessField");
+
+        let correct_answer = "";
+        let galleryDict = {};
+
+        function analyzeGuess(guess) {
+            let returnArray = [];
+            for (let i = 0; i < guess.length; i++) {
+                let guessedLetter = [...guess][i];
+                let answerLetter = [...correct_answer][i];
+                if (correct_answer.includes(guessedLetter)) {
+                    galleryDict[guessedLetter] = galleryGuessedCorrectly;
+                    if (guessedLetter === answerLetter) {
+                        returnArray.push(guessTableExactlyCorrect);
+                    } else {
+                        returnArray.push(guessTableCorrect);
+                    }
+                } else {
+                    galleryDict[guessedLetter] = galleryGuessedIncorrectly;
+                    returnArray.push(guessTableIncorrect);
+                }
+            }
+            return returnArray;
+        }
+
+        function displayGuesses(userGuess) {
+            const guessAnalysisArray = analyzeGuess(userGuess);
+            let row = guessesTable.insertRow()
+            for (i = 0; i < answerLength; i++) {
+                const letter = [...userGuess][i]
+                const td = document.createElement('td')
+                td.appendChild(document.createTextNode(letter));
+                td.className = guessAnalysisArray[i].style
+                row.appendChild(td);
+            }
+        }
+
+        function displayGallery() {
+            var tableRows = galleryData.getElementsByTagName('tr');
+            if (tableRows.length > 0) {
+                galleryData.removeChild(tableRows[0]);
+            }
+            row = document.createElement('tr');
+            for (const letter in galleryDict) {
+                const td = document.createElement('td');
+                td.appendChild(document.createTextNode(letter));
+                td.className = galleryDict[letter].style
+                row.appendChild(td);
+            }
+            galleryData.appendChild(row)
+        }
+
+        function resetGame() {
+            const rowCount = guessesTable.rows.length; 
+            for (i = 0; i < rowCount; i++) {
+                guessesTable.deleteRow(0)
+            }
+            if (typeof resetButton !== 'undefined') {
+                resetButton.parentNode.removeChild(resetButton);
+            }
+
+            guessField.disabled = false;
+            guessSubmit.disabled = false;
+            guessField.value = "";
+            guessField.focus();
+
+            lastResult.style.backgroundColor = "white";
+
+            correct_answer = possibleAnswers[(Math.floor(Math.random() * possibleAnswers.length))].toUpperCase();
+
+            for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                galleryDict[char] = galleryNotGuessed;
+            }
+
+            displayGallery();
+        }
+
+        function setGameOver() {
+            guessField.disabled = true;
+            guessSubmit.disabled = true;
+            resetButton = document.createElement("button");
+            resetButton.textContent = "Start new game";
+            document.body.append(resetButton);
+            resetButton.addEventListener("click", resetGame);
+        }
+
+        function checkGuess() {
+            const userGuess = guessField.value.toUpperCase();
+
+            if (!possibleAnswers.includes(userGuess)) {
+                lastResult.textContent = "I don't recognize that word.";
+                lastResult.style.color = "black";
+                lastResult.style.backgroundColor = "yellow";
+                guessField.value = "";
+                guessField.focus();
+            }
+            else {
+                lastResult.style.color = "white";
+                lastResult.style.backgroundColor = "white";
+
+                displayGuesses(userGuess);
+                displayGallery();
+
+                if (userGuess === correct_answer) {
+                    lastResult.textContent = "Congratulations! You got it right!";
+                    lastResult.style.backgroundColor = "green";
+                    setGameOver();
+                } else {
+                    lastResult.textContent = "";
+                }
+
+                guessField.value = "";
+                guessField.focus();
+            }
+        }
+
+        resetGame();
+        guessSubmit.addEventListener("click", checkGuess);
+
+    </script>
+</body>
+
+</html>
