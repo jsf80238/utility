@@ -48,7 +48,8 @@
         }
 
         .form input {
-            width: 150px;
+            width: 100px;
+            font-size: large;
         }
 
         .lastResult {
@@ -136,9 +137,8 @@
     </table>
     <p></p>
     <div class="">
-        <table class="">
-            <tbody class="galleryData">
-            </tbody>
+        <table class="galleryData" id="galleryData">
+            <tbody></tbody>
         </table>
     </div>
     <p></p>
@@ -154,6 +154,7 @@
         <br>
         <input type="submit" value="Guess" class="guessSubmit">
         <p class="lastResult"></p>
+        <p class="playAgain"></p>
     </div>
 
     <script>
@@ -175,19 +176,20 @@
         const guesses = document.querySelector(".guesses");
         const guessesTable = guesses.getElementsByTagName("tbody")[0];
         const lastResult = document.querySelector(".lastResult");
+        const playAgain = document.querySelector(".playAgain");
         const galleryData = document.querySelector(".galleryData");
         const guessSubmit = document.querySelector(".guessSubmit");
         const guessField = document.querySelector(".guessField");
 
-        let correct_answer = "";
+        let correctAnswer = "";
         let galleryDict = {};
 
         function analyzeGuess(guess) {
             let returnArray = [];
             for (let i = 0; i < guess.length; i++) {
                 let guessedLetter = [...guess][i];
-                let answerLetter = [...correct_answer][i];
-                if (correct_answer.includes(guessedLetter)) {
+                let answerLetter = [...correctAnswer][i];
+                if (correctAnswer.includes(guessedLetter)) {
                     galleryDict[guessedLetter] = galleryGuessedCorrectly;
                     if (guessedLetter === answerLetter) {
                         returnArray.push(guessTableExactlyCorrect);
@@ -202,6 +204,12 @@
             return returnArray;
         }
 
+        function setGuessStyle(i, delayInMs, cell, style) {
+            setTimeout(function () {
+                cell.className = style;
+            }, delayInMs * i);
+        }
+
         function displayGuesses(userGuess) {
             const guessAnalysisArray = analyzeGuess(userGuess);
             let row = guessesTable.insertRow()
@@ -209,28 +217,37 @@
                 const letter = [...userGuess][i]
                 const td = document.createElement('td')
                 td.appendChild(document.createTextNode(letter));
-                td.className = guessAnalysisArray[i].style
+                // td.className = guessAnalysisArray[i].style
                 row.appendChild(td);
+            }
+            var cells = row.getElementsByTagName('td');
+            for (var i = 0; i < cells.length; i++) {
+                setGuessStyle(i, 250, cells[i], guessAnalysisArray[i].style);
             }
         }
 
         function displayGallery() {
-            var tableRows = galleryData.getElementsByTagName('tr');
-            if (tableRows.length > 0) {
-                galleryData.removeChild(tableRows[0]);
+            const rowCount = galleryData.rows.length;
+            for (i = 0; i < rowCount; i++) {
+                galleryData.deleteRow(0)
             }
-            row = document.createElement('tr');
-            for (const letter in galleryDict) {
-                const td = document.createElement('td');
-                td.appendChild(document.createTextNode(letter));
-                td.className = galleryDict[letter].style
-                row.appendChild(td);
+            const firstRow = "QWERTYUIOP";
+            const secondRow = "ASDFGHJKL ";
+            const thirdRow = " ZXCVBNM  ";
+            const keyboardArray = [firstRow, secondRow, thirdRow];
+            for (i = 0; i < keyboardArray.length; i++) {
+                let row = galleryData.insertRow(i)
+                for (const letter of keyboardArray[i]) {
+                    const td = document.createElement('td');
+                    td.appendChild(document.createTextNode(letter));
+                    td.className = galleryDict[letter].style
+                    row.appendChild(td);
+                }
             }
-            galleryData.appendChild(row)
         }
 
         function resetGame() {
-            const rowCount = guessesTable.rows.length; 
+            const rowCount = guessesTable.rows.length;
             for (i = 0; i < rowCount; i++) {
                 guessesTable.deleteRow(0)
             }
@@ -245,9 +262,10 @@
 
             lastResult.style.backgroundColor = white;
 
-            correct_answer = possibleAnswers[(Math.floor(Math.random() * possibleAnswers.length))].toUpperCase();
+            correctAnswer = possibleAnswers[(Math.floor(Math.random() * possibleAnswers.length))].toUpperCase();
+            correctAnswer = "ABIDE"
 
-            for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+            for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ') {
                 galleryDict[char] = galleryNotGuessed;
             }
 
@@ -258,8 +276,8 @@
             guessField.disabled = true;
             guessSubmit.disabled = true;
             resetButton = document.createElement("button");
-            resetButton.textContent = "Start new game";
-            document.body.append(resetButton);
+            resetButton.textContent = "Play Again";
+            playAgain.appendChild(resetButton);
             resetButton.addEventListener("click", resetGame);
         }
 
@@ -280,7 +298,7 @@
                 displayGuesses(userGuess);
                 displayGallery();
 
-                if (userGuess === correct_answer) {
+                if (userGuess === correctAnswer) {
                     lastResult.textContent = "Congratulations! You got it right!";
                     lastResult.style.backgroundColor = green;
                     setGameOver();
@@ -298,4 +316,5 @@
 
     </script>
 </body>
+
 </html>
