@@ -45,6 +45,7 @@
         .guesses {
             display: flex;
             justify-content: center;
+            font-size: large;
         }
 
         .form input {
@@ -165,6 +166,7 @@
         const white = "white"
         const yellow = "yellow"
         const green = "green"
+        const visualEffectDelay = 400
 
         const galleryNotGuessed = { style: "galleryNotGuessed" }
         const galleryGuessedCorrectly = { style: "galleryGuessedCorrectly" }
@@ -222,7 +224,7 @@
             }
             var cells = row.getElementsByTagName('td');
             for (var i = 0; i < cells.length; i++) {
-                setGuessStyle(i, 250, cells[i], guessAnalysisArray[i].style);
+                setGuessStyle(i, visualEffectDelay, cells[i], guessAnalysisArray[i].style);
             }
         }
 
@@ -263,7 +265,6 @@
             lastResult.style.backgroundColor = white;
 
             correctAnswer = possibleAnswers[(Math.floor(Math.random() * possibleAnswers.length))].toUpperCase();
-            correctAnswer = "ABIDE"
 
             for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ') {
                 galleryDict[char] = galleryNotGuessed;
