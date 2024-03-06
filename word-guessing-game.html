@@ -85,63 +85,64 @@
 
         .guessTableCorrect {
             color: black;
-            background-color: lightblue;
+            background-color: lightgreen;
+            font-style: italic;
         }
 
         .guessTableExactlyCorrect {
             color: black;
-            background-color: lightgreen;
+            background-color: lawngreen;
             font-weight: bold;
+            font-size: larger;
         }
-
+/* 
         .keyTable {
             display: flex;
             justify-content: center;
         }
 
-        .keyIncorrect {
+        .keyNotUsed {
             color: black;
             background-color: tomato;
-            column-width: 125px;
+            column-width: 150px;
             border: 1px solid #000;
         }
 
-        .keyCorrect {
+        .keyUsed {
             color: black;
-            background-color: lightblue;
-            column-width: 125px;
+            background-color: yellow;
+            column-width: 150px;
             border: 1px solid #000;
         }
 
-        .keyExactlyCorrect {
+        .keyUsedThere {
             color: black;
             background-color: lightgreen;
-            column-width: 125px;
+            column-width: 150px;
             border: 1px solid #000;
-        }
+        } */
     </style>
 </head>
 
 <body>
     <h1>Word Guessing Game</h1>
-    <p>We have selected a random 5-letter word. See if you can guess it in as few turns as possible. We'll tell you
-        how your guess matches (or does not) the answer with these colors:</p>
-    <p></p>
-    <table class="keyTable">
-        <tbody>
-            <tr>
-                <th class="keyIncorrect">Incorrect</th>
-                <th class="keyCorrect">Correct</th>
-                <th class="keyExactlyCorrect">Exactly Correct</th>
-            </tr>
-        </tbody>
-    </table>
+    <p>See if you can guess the randomly-selected 5-letter word. You get an infinite number of guesses. Letters may appear more than once. We'll use colors to show how your guess matches (or does not).</p>
     <p></p>
     <div class="">
         <table class="galleryData" id="galleryData">
             <tbody></tbody>
         </table>
     </div>
+    <!-- <p></p>
+    <table class="keyTable">
+        <tbody>
+            <tr>
+                <th class="keyNotUsed">Letter not used</th>
+                <th class="keyUsed">Letter used</th>
+                <th class="keyUsedThere">Letter used there</th>
+            </tr>
+        </tbody>
+    </table> -->
     <p></p>
     <div>
         <table class="guesses" id="guesses">
@@ -265,6 +266,7 @@
             lastResult.style.backgroundColor = white;
 
             correctAnswer = possibleAnswers[(Math.floor(Math.random() * possibleAnswers.length))].toUpperCase();
+            correctAnswer = "ABIDE"
 
             for (const char of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ') {
                 galleryDict[char] = galleryNotGuessed;
@@ -300,9 +302,11 @@
                 displayGallery();
 
                 if (userGuess === correctAnswer) {
-                    lastResult.textContent = "Congratulations! You got it right!";
-                    lastResult.style.backgroundColor = green;
-                    setGameOver();
+                    setTimeout(function () {
+                        lastResult.textContent = "Congratulations!";
+                        lastResult.style.backgroundColor = green;
+                        setGameOver();
+                    }, visualEffectDelay * answerLength);
                 } else {
                     lastResult.textContent = "";
                 }
@@ -314,6 +318,12 @@
 
         resetGame();
         guessSubmit.addEventListener("click", checkGuess);
+        guessField.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkGuess();
+            }
+        });
 
     </script>
 </body>
