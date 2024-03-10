@@ -18,7 +18,7 @@
             margin: 0 auto;
         }
 
-        h1 {
+        h3, h5 {
             text-align: center;
         }
 
@@ -95,54 +95,18 @@
             font-weight: bold;
             font-size: larger;
         }
-/* 
-        .keyTable {
-            display: flex;
-            justify-content: center;
-        }
-
-        .keyNotUsed {
-            color: black;
-            background-color: tomato;
-            column-width: 150px;
-            border: 1px solid #000;
-        }
-
-        .keyUsed {
-            color: black;
-            background-color: yellow;
-            column-width: 150px;
-            border: 1px solid #000;
-        }
-
-        .keyUsedThere {
-            color: black;
-            background-color: lightgreen;
-            column-width: 150px;
-            border: 1px solid #000;
-        } */
     </style>
 </head>
 
 <body>
-    <h1>Word Guessing Game</h1>
-    <p>See if you can guess the randomly-selected 5-letter word. You get an infinite number of guesses. Letters may appear more than once. We'll use colors to show how your guess matches (or does not).</p>
+    <h3>Word Guessing Game</h3>
+    <h5><a href="word-guessing-game-instructions.html">Instructions</a>.</h5>
     <p></p>
     <div class="">
         <table class="galleryData" id="galleryData">
             <tbody></tbody>
         </table>
     </div>
-    <!-- <p></p>
-    <table class="keyTable">
-        <tbody>
-            <tr>
-                <th class="keyNotUsed">Letter not used</th>
-                <th class="keyUsed">Letter used</th>
-                <th class="keyUsedThere">Letter used there</th>
-            </tr>
-        </tbody>
-    </table> -->
     <p></p>
     <div>
         <table class="guesses" id="guesses">
@@ -151,7 +115,6 @@
     </div>
     <p></p>
     <div class="form" align="center">
-        <!-- <label for="guessField">Enter a guess: </label> -->
         <input id="guessField" class="guessField" type="text" value="" pattern="\w{5}" required />
         <br>
         <input type="submit" value="Guess" class="guessSubmit">
@@ -169,12 +132,12 @@
         const green = "green"
         const visualEffectDelay = 400
 
-        const galleryNotGuessed = { style: "galleryNotGuessed" }
-        const galleryGuessedCorrectly = { style: "galleryGuessedCorrectly" }
-        const galleryGuessedIncorrectly = { style: "galleryGuessedIncorrectly" }
-        const guessTableIncorrect = { style: "guessTableIncorrect" }
-        const guessTableCorrect = { style: "guessTableCorrect" }
-        const guessTableExactlyCorrect = { style: "guessTableExactlyCorrect" }
+        const galleryNotGuessed = "galleryNotGuessed"
+        const galleryGuessedCorrectly = "galleryGuessedCorrectly"
+        const galleryGuessedIncorrectly = "galleryGuessedIncorrectly"
+        const guessTableIncorrect = "guessTableIncorrect"
+        const guessTableCorrect = "guessTableCorrect"
+        const guessTableExactlyCorrect = "guessTableExactlyCorrect"
 
         const guesses = document.querySelector(".guesses");
         const guessesTable = guesses.getElementsByTagName("tbody")[0];
@@ -220,12 +183,11 @@
                 const letter = [...userGuess][i]
                 const td = document.createElement('td')
                 td.appendChild(document.createTextNode(letter));
-                // td.className = guessAnalysisArray[i].style
                 row.appendChild(td);
             }
             var cells = row.getElementsByTagName('td');
             for (var i = 0; i < cells.length; i++) {
-                setGuessStyle(i, visualEffectDelay, cells[i], guessAnalysisArray[i].style);
+                setGuessStyle(i, visualEffectDelay, cells[i], guessAnalysisArray[i]);
             }
         }
 
@@ -243,7 +205,7 @@
                 for (const letter of keyboardArray[i]) {
                     const td = document.createElement('td');
                     td.appendChild(document.createTextNode(letter));
-                    td.className = galleryDict[letter].style
+                    td.className = galleryDict[letter]
                     row.appendChild(td);
                 }
             }
@@ -305,7 +267,7 @@
                         lastResult.textContent = "Congratulations!";
                         lastResult.style.backgroundColor = green;
                         setGameOver();
-                    }, visualEffectDelay * answerLength);
+                    }, visualEffectDelay * (answerLength-1));
                 } else {
                     lastResult.textContent = "";
                 }

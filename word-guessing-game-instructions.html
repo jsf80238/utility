@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Word guessing game</title>
+
+    <style>
+        html {
+            font-family: monospace;
+        }
+
+        body {
+            width: 50%;
+            max-width: 800px;
+            min-width: 480px;
+            margin: 0 auto;
+        }
+
+        p {
+            text-align: left;
+        }
+
+        h3,
+        h5 {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            height: 100%;
+            display: block;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            margin: auto;
+        }
+
+        table tr td {
+            border: 1px solid #000;
+            padding: 5px;
+        }
+
+        .galleryData {
+            display: flex;
+            justify-content: center;
+        }
+
+        .guessTableIncorrect {
+            color: black;
+            background-color: tomato;
+        }
+
+        .guessTableCorrect {
+            color: black;
+            background-color: lightgreen;
+            font-style: italic;
+        }
+
+        .guessTableExactlyCorrect {
+            color: black;
+            background-color: lawngreen;
+            font-weight: bold;
+            font-size: larger;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Word Guessing Game Instructions</h3>
+    <h5><a href="word-guessing-game.html">Game</a>.</h5>
+    <div>
+        <table class="galleryData">
+            <tbody>
+                <tr>
+                    <td>
+                        <p>A letter may appear in the answer more than once.&nbsp;The answer will never be a plural
+                            noun,
+                            for example <strong>ROCKS</strong> or <strong>HANDS</strong> will never be answers. The
+                            following colors indicate how a letter matches (or doesn&#39;t) the
+                            answer:
+                        </p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="guessTableIncorrect">Letter does not exist in the word.</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableCorrect">Letter exists in the word, but not here.</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableExactlyCorrect">Letter is correctly placed.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <p>In the example below the word to be guessed is <strong>UPEND</strong>.&nbsp;</p>
+
+                        <table class="galleryData">
+                            <tbody>
+                                <tr>
+                                    <td class="guessTableIncorrect">G</td>
+                                    <td class="guessTableCorrect">U</td>
+                                    <td class="guessTableExactlyCorrect">E</td>
+                                    <td class="guessTableIncorrect">S</td>
+                                    <td class="guessTableIncorrect">S</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableCorrect">N</td>
+                                    <td class="guessTableCorrect">U</td>
+                                    <td class="guessTableCorrect">D</td>
+                                    <td class="guessTableIncorrect">G</td>
+                                    <td class="guessTableCorrect">E</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableExactlyCorrect">U</td>
+                                    <td class="guessTableExactlyCorrect">P</td>
+                                    <td class="guessTableCorrect">P</td>
+                                    <td class="guessTableCorrect">E</td>
+                                    <td class="guessTableIncorrect">R</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableExactlyCorrect">U</td>
+                                    <td class="guessTableExactlyCorrect">P</td>
+                                    <td class="guessTableCorrect">P</td>
+                                    <td class="guessTableCorrect">E</td>
+                                    <td class="guessTableExactlyCorrect">D</td>
+                                </tr>
+                                <tr>
+                                    <td class="guessTableExactlyCorrect">U</td>
+                                    <td class="guessTableExactlyCorrect">P</td>
+                                    <td class="guessTableExactlyCorrect">E</td>
+                                    <td class="guessTableExactlyCorrect">N</td>
+                                    <td class="guessTableExactlyCorrect">D</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
