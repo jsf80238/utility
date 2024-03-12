@@ -1,6 +1,9 @@
 # Author
 [Jason Friedman](https://www.linkedin.com/in/jasonfriedmantechnology/) is the author of this code.
 
+# Play Wordle
+[Play](https://jsf80238.github.io/utility/word-guessing-game.html).
+
 # parse-unicode.py
 ## Overview
 I have many times been asked to diagnose cases where data flowing from a source fails to be accepted by a target with an error like:
