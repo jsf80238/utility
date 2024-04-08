@@ -24,4 +24,7 @@ for file_io in file_io_list:
                 print()
                 print(os.path.basename(file_io.name))
                 is_filename_printed = True
-            print("  " + ",".join(row.values()))
+            try:
+                print("  " + ",".join(row.values()))
+            except Exception:
+                print(row)
