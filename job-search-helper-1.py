@@ -5,12 +5,19 @@ import re
 import requests
 import sys
 import urllib.parse
-from playwright.sync_api import Browser, Page, expect, sync_playwright
+from bs4 import BeautifulSoup
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d.%H:%M:%S")
 BASE_SEARCH_STRING = "https://www.google.com/search?q="
+PREFIX = "/url?q="
+SUFFIX = "&"
 
-extra_list = ("jobs", "careers")
+extra_list = ("jobs", "careers", "search results")
+link_text_pattern_list = (
+    re.compile(r"search\s+results", re.IGNORECASE),
+    re.compile(r"careers", re.IGNORECASE),
+    re.compile(r"jobs", re.IGNORECASE),
+)
 
 employer_list = (
     "Humana",
@@ -272,39 +279,34 @@ employer_list = (
 )
 
 
-def get_link_with_name(page: Page, name: str) -> str:
-    for link in page.get_by_role("link", name=name).all():
-        return link.get_attribute('href')
-        break
-    return None
-
-
-def search_employer(browser: Browser, name: str) -> list:
-    result = list()
-    page = browser.new_page()
+def search_employer(name: str) -> list:
     for extra in extra_list:
-        full_search_string = BASE_SEARCH_STRING + name + "%20" + extra
-        page.goto(full_search_string, timeout=10000)
-        result.append(get_link_with_name(page, name))
-        if result:
-            break
-    page.close()
-    return result
-
+        full_search_string = BASE_SEARCH_STRING + urllib.parse.quote(name + " " + extra)
+        response = requests.get(full_search_string)
+        soup = BeautifulSoup(response.text, features="html.parser")
+        for link in soup.find_all('a'):
+            url_text = link.attrs['href']
+            if url_text.startswith(PREFIX):
+                url = url_text.split(PREFIX)[-1].split(SUFFIX)[0]
+                for pattern in link_text_pattern_list:
+                    if pattern.search(link.text):
+                        return url
+    raise Exception("No link found.")
 
 if not employer_list:
     exit()
 padding = 1 + int(math.log10(len(employer_list)))
 result_list = list()
-with sync_playwright() as p, p.chromium.launch() as browser:
-    for i, employer_name in enumerate(employer_list, 1):
-        encoded_name = urllib.parse.quote(employer_name)
-        item_number = str(i).rjust(padding)
-        logging.info(f"Employer {item_number} of {len(employer_list)}: {employer_name}")
-        result = search_employer(browser, employer_name)[0]
+for i, employer_name in enumerate(employer_list, 1):
+    item_number = str(i).rjust(padding)
+    logging.info(f"Employer {item_number} of {len(employer_list)}: {employer_name}")
+    try:
+        result = search_employer(employer_name)
         result_list.append((employer_name, None, None, None, None, result))
-        if False and i > 2:
-            break
+    except Exception as e:
+        logging.warning(e)
+    if False and i >= 2:
+        break
 
 header = (
     "Company",
