@@ -17,7 +17,7 @@ regex = re.compile("^[a-zA-Z]+$")
 match = regex.match(letters)
 if not match:
     parser.error("Letters only for first argument.")
-regex = re.compile("^[a-zA-Z_\?]+$")
+regex = re.compile(r"^[a-zA-Z_\?]+$")
 match = regex.match(pattern)
 if not match:
     parser.error("Letters, underscores and question marks only for second argument.")
@@ -32,7 +32,7 @@ for permutation in itertools.permutations(letters, len(pattern)):
     if not potential_match.lower() in valid_word_set:
         continue
     # Now check if it matches the pattern given by the user
-    search_pattern_text = "(" + pattern.replace("_", "\w").replace("?", "\w") + ")"
+    search_pattern_text = "(" + pattern.replace("_", r"\w").replace("?", r"\w") + ")"
     regex = re.compile(search_pattern_text, re.IGNORECASE)
     match = regex.match(potential_match)
     if match:
