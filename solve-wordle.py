@@ -1,4 +1,3 @@
-# https://apps.apple.com/us/app/wordscapes-uncrossed/id1302451299
 import argparse
 import itertools
 import re
@@ -9,12 +8,12 @@ parser.add_argument('letters', metavar="LETTERS", help="Letters which could be u
 parser.add_argument('pattern', metavar="PATTERN", help="Enter constraints here. Use underscores or question marks for the letters to be filled in/guessed.")
 parser.add_argument('--dictionary-file', metavar='/path/to/dictionary', default=DEFAULT_DICTIONARY_FILE, help=f'Depends on operating system, default is {DEFAULT_DICTIONARY_FILE}.')
 args = parser.parse_args()
-letters = args.letters
+allowed_letters = args.letters
 pattern = args.pattern
 dictionary_file = args.dictionary_file
 solution_length = len(pattern)
 regex = re.compile("^[a-zA-Z]+$")
-match = regex.match(letters)
+match = regex.match(allowed_letters)
 if not match:
     parser.error("Letters only for first argument.")
 regex = re.compile(r"^[a-zA-Z_\?]+$")
@@ -26,10 +25,15 @@ if not match:
 valid_word_set = set([line.strip().lower() for line in open(dictionary_file).readlines()])
 
 match_set = set()
-for permutation in itertools.permutations(letters, len(pattern)):
-    potential_match = "".join(list(permutation))
-    # Check whether this permutation is a valid word
-    if not potential_match.lower() in valid_word_set:
+for potential_match in valid_word_set:
+    if len(potential_match) != 5:
+        continue
+    is_clear = True
+    for letter in potential_match:
+        if letter not in allowed_letters:
+            is_clear = False
+            break
+    if not is_clear:
         continue
     # Now check if it matches the pattern given by the user
     search_pattern_text = "(" + pattern.replace("_", r"\w").replace("?", r"\w") + ")"
