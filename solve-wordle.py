@@ -2,7 +2,6 @@ import argparse
 import itertools
 import re
 DEFAULT_DICTIONARY_FILE = "/usr/share/dict/american-english"  # On Ubuntu at least
-WORD_LENGTH = 5
 
 parser = argparse.ArgumentParser(description='Solve wordscapes problems.', epilog='Example patterns: "b?ll"  "____"  "ca_"  "mo?se"')
 parser.add_argument('allowed', metavar="ALLOWED_LETTERS", help="Letters which can be used in the solution, case-insensitive.")
@@ -14,28 +13,31 @@ args = parser.parse_args()
 allowed_letters = args.allowed
 required_letters = args.required or list()
 pattern = args.pattern
-anti_pattern = args.anti_pattern or "_" * WORD_LENGTH
-dictionary_file = args.dictionary_file
 solution_length = len(pattern)
-regex = re.compile("^[a-zA-Z]+$")
-match = regex.match(allowed_letters)
-if not match:
-    parser.error("Letters only for first argument.")
-regex = re.compile(r"^[a-zA-Z_\?]+$")
-match = regex.match(pattern)
-if not match:
-    parser.error("Letters, underscores and question marks only for second argument.")
+anti_pattern = args.anti_pattern or "_" * solution_length
+dictionary_file = args.dictionary_file
 
-# Letters in the must list should be merged into the allowed list
+regex = re.compile("^[a-zA-Z]+$")
+if not regex.match(allowed_letters):
+    parser.error("Letters only for first argument.")
+if not regex.match(required_letters):
+    parser.error("Letters only for required letters.")
+
+regex = re.compile(r"^[a-zA-Z_\?]+$")
+if not regex.match(pattern):
+    parser.error("Letters, underscores and question marks only for second argument.")
+if not regex.match(anti_pattern):
+    parser.error("Letters, underscores and question marks only for anti-pattern.")
+if len(anti_pattern) != solution_length:
+    parser.error("Anti-pattern, if provided, must be same length as pattern.")
+
+# Letters in the required list should be merged into the allowed list
 allowed_letters = set(allowed_letters) | set(required_letters)
 # Get valid words
-valid_word_set = set([line.strip().lower() for line in open(dictionary_file).readlines()])
+valid_word_set = set([line.strip().lower() for line in open(dictionary_file).readlines() if len(line.strip()) == solution_length])
 
 match_set = set()
 for candidate in valid_word_set:
-    if len(candidate) != WORD_LENGTH:
-        continue
-    # candidate = "deere"
     is_clear = True
     # Reject if the candidate contains a letter not in allowed letters
     for letter in candidate:
@@ -48,7 +50,7 @@ for candidate in valid_word_set:
             is_clear = False
             break
     # Verify it does not match the anti-pattern
-    for i in range(WORD_LENGTH):
+    for i in range(solution_length):
         if candidate[i] == anti_pattern[i]:
             is_clear = False
             break
