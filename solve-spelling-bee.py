@@ -21,7 +21,7 @@ letters_set = set(other_letters + center_letter)
 
 match_set = set()
 for candidate in [x.strip().lower() for x in open(dictionary_file).readlines()]:
-    if len(candidate) >= DEFAULT_MINIMUM_ALLOWED_LENGTH:
+    if len(candidate) >= minimum_length:
         #candidate = "track"
         if center_letter in candidate:
             if set(candidate).issubset(letters_set):
