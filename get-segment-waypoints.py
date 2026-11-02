@@ -24,7 +24,7 @@ for item in data[FEATURES]:
     if item.get(GEOMETRY).get(TYPE) == POINT:
         segment_name = item[PROPERTIES][TITLE]
         if segment_name.startswith("00. Waterton") or re.search(pattern, segment_name):
-            latitude, longitude, _, _ = item[GEOMETRY].get(COORDINATES)
+            longitude, latitude, _, _ = item[GEOMETRY].get(COORDINATES)
             feature = {
                 GEOMETRY: {
                     COORDINATES: (round(latitude, 4), round(longitude, 4)),

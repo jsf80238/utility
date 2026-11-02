@@ -1,5 +1,4 @@
 import json
-import mimetypes
 import sys
 from collections import defaultdict
 from math import sin, cos, sqrt, atan2, pi
@@ -10,15 +9,17 @@ with open(input_file, 'r') as f:
     data = json.load(f)
 
 RADIUS_OF_EARTH = 6371 * 3281  # feet
-GEOMETRY = "geometry"
+TURN_PATTERN = re.compile(r'(\d+)-(\d+\w+)-(\S+)')
+
 COORDINATES = "coordinates"
-LINE_STRING = "LineString"
-TYPE = "type"
+DESCRIPTION = "description"
 FEATURES = "features"
+GEOMETRY = "geometry"
+LINE_STRING = "LineString"
+POINT = "Point"
 PROPERTIES = "properties"
 TITLE = "title"
-POINT = "Point"
-TURN_PATTERN = re.compile(r'title": "(\d+)-(\d+\w+)-(\S+)"')
+TYPE = "type"
 
 '''
 TENT_PROPERTIES = {
@@ -68,23 +69,34 @@ day_dict = defaultdict(list)
 
 for item in data[FEATURES]:
     if GEOMETRY in item:
-        if item.get(GEOMETRY).get(TYPE) == LINE_STRING:
+        if item[GEOMETRY].get(TYPE) == LINE_STRING:
             segment_name = item[PROPERTIES][TITLE]
-            for longitude, latitude in item[GEOMETRY].get(COORDINATES):
-                day_dict[segment_name].append((round(latitude, 4), round(longitude, 4)))
+            try:
+                _, day_number = segment_name.split()
+            except:
+                pass
+            for longitude, latitude in item[GEOMETRY].get(COORDINATES):  # Stored out-of-order is output JSON from Caltopo
+                day_dict[day_number].append((round(latitude, 4), round(longitude, 4)))
 
+day_point_counter_dict = {x:2 for x in day_dict.keys()}
 
-def get_day_name(target_latitude: float, target_longitude: float) -> str:
-    closest_day_name = None
+def get_day_number(target_latitude: float, target_longitude: float) -> str:
+    """
+    Iterate over all the points in all the Caltopo lines and find the closest point by distance
+    :param target_latitude:
+    :param target_longitude:
+    :return: the name of that line, with the "Day" removed
+    """
+    closest_day_number = None
     minimum_distance = sys.maxsize
-    for day, coordinate_list in day_dict.items():
+    for day_number, coordinate_list in day_dict.items():
         for latitude, longitude in coordinate_list:
             distance = haversine_distance(target_latitude, target_longitude, latitude, longitude)
             if distance < minimum_distance:
                 minimum_distance = distance
-                closest_day_name = day
-    if closest_day_name:
-        return closest_day_name
+                closest_day_number = day_number
+    if closest_day_number:
+        return closest_day_number
     raise ValueError("No closest day found")
 
 
@@ -93,13 +105,34 @@ for item in data[FEATURES]:
     if GEOMETRY in item:
         if "camp" in item[PROPERTIES][TITLE].lower():
             item[PROPERTIES]["marker-symbol"] = "camping"
-        if item.get(GEOMETRY).get(TYPE) == POINT:
-            pass
-    feature_list.append(item)
+        if item[GEOMETRY].get(TYPE) == POINT:
+            if match := TURN_PATTERN.search(item[PROPERTIES][TITLE]):
+                # 02. xx-left
+                longitude, latitude, _, _ = item[GEOMETRY][COORDINATES]
+                day_number = get_day_number(latitude, longitude)
+                day_point_number_as_string = str(day_point_counter_dict[day_number]).rjust(2, "0")
+                day_point_counter_dict[day_number] += 2
+                current_title_parts = item[PROPERTIES][TITLE].split("-")
+                current_title = "-".join(current_title_parts[0:2])
+                current_description = item[PROPERTIES].get(DESCRIPTION) or ""
+                new_title = f"{day_number}. {day_point_number_as_string}-{match.group(3)}"
+                if current_description:
+                    new_description = f"{current_description}. Original title: {current_title}"
+                else:
+                    new_description = f"Original title: {current_title}"
+                item[PROPERTIES][TITLE] = new_title
+                item[PROPERTIES][DESCRIPTION] = new_description
+        feature_list.append(item)
 
+# for item in feature_list:
+#     print(type(item))
+#     from pprint import pprint
+#     pprint(item)
+#     print()
+# exit()
 result_dict = {
-    TYPE: "FeatureCollection",
     FEATURES: feature_list,
+    TYPE: "FeatureCollection",
 }
 
 print(json.dumps(result_dict, indent=2))
